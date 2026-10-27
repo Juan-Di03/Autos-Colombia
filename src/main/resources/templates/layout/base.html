@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo != null ? titulo + ' - Autos Colombia' : 'Parqueadero Autos Colombia'}">Parqueadero Autos Colombia</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Estilos personalizados basados en Mockups Figma -->
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="d-flex align-items-center">
+                <div class="brand-badge">P</div>
+                <div>
+                    <h1 class="brand-title">Parqueo</h1>
+                    <p class="brand-sub">Control de Ingreso</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">Operación</div>
+            <a th:href="@{/ingreso}" class="sidebar-link" th:classappend="${moduloActivo == 'ingreso' ? 'active' : ''}">
+                <i class="bi bi-arrow-down-circle"></i>
+                <span>Registrar ingreso</span>
+            </a>
+            <a th:href="@{/salida}" class="sidebar-link" th:classappend="${moduloActivo == 'salida' ? 'active' : ''}">
+                <i class="bi bi-arrow-up-circle"></i>
+                <span>Registrar salida</span>
+            </a>
+            <a th:href="@{/novedades/celda}" class="sidebar-link" th:classappend="${moduloActivo == 'novedad_celda' ? 'active' : ''}">
+                <i class="bi bi-wrench"></i>
+                <span>Novedad de celda</span>
+            </a>
+
+            <div class="nav-section-title mt-3">Administración</div>
+            <a th:href="@{/celdas}" class="sidebar-link" th:classappend="${moduloActivo == 'celdas' ? 'active' : ''}">
+                <i class="bi bi-grid-3x3-gap"></i>
+                <span>Estado de celdas</span>
+            </a>
+            <a th:href="@{/novedades/vehiculo}" class="sidebar-link" th:classappend="${moduloActivo == 'novedad_vehiculo' ? 'active' : ''}">
+                <i class="bi bi-file-earmark-text"></i>
+                <span>Novedades de vehículo</span>
+            </a>
+            <a th:href="@{/historial}" class="sidebar-link" th:classappend="${moduloActivo == 'historial' ? 'active' : ''}">
+                <i class="bi bi-clock-history"></i>
+                <span>Historial</span>
+            </a>
+
+            <div class="nav-section-title mt-3">Cliente</div>
+            <a th:href="@{/consultar-celda}" class="sidebar-link" th:classappend="${moduloActivo == 'consulta_cliente' ? 'active' : ''}">
+                <i class="bi bi-geo-alt"></i>
+                <span>Consultar mi celda</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="fw-bold text-dark">Puesto de ingreso</div>
+            <div>Consola para empleados</div>
+            <div>Control de vehículos</div>
+        </div>
+    </aside>
+
+    <!-- Área Principal -->
+    <div class="main-wrapper">
+        <header class="topbar">
+            <div class="breadcrumb-nav">
+                <span th:text="${seccion != null ? seccion : 'Operación'}">Operación</span>
+                <i class="bi bi-chevron-right mx-1 small"></i>
+                <span class="active" th:text="${subseccion != null ? subseccion : 'Registro de ingreso'}">Registro de ingreso</span>
+            </div>
+            <div class="topbar-meta">
+                <div>
+                    <i class="bi bi-calendar3 me-1"></i>
+                    <span th:text="${fechaActual != null ? fechaActual : '27 oct 2026'}">27 oct 2026</span>
+                </div>
+                <div class="user-badge">
+                    <i class="bi bi-person-circle fs-5 text-secondary"></i>
+                    <span th:text="${usuarioRol != null ? usuarioRol : 'Empleado'}">Empleado</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="content-body" th:insert="${contenido}">
+            <!-- El contenido específico de cada página se inserta aquí -->
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

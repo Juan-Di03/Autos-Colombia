@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar salida - Parqueadero Autos Colombia</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="d-flex align-items-center">
+                <div class="brand-badge">P</div>
+                <div>
+                    <h1 class="brand-title">Parqueo</h1>
+                    <p class="brand-sub">Control de Ingreso</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">Operación</div>
+            <a th:href="@{/ingreso}" class="sidebar-link">
+                <i class="bi bi-arrow-down-circle"></i>
+                <span>Registrar ingreso</span>
+            </a>
+            <a th:href="@{/salida}" class="sidebar-link active">
+                <i class="bi bi-arrow-up-circle"></i>
+                <span>Registrar salida</span>
+            </a>
+            <a th:href="@{/novedades/celda}" class="sidebar-link">
+                <i class="bi bi-wrench"></i>
+                <span>Novedad de celda</span>
+            </a>
+
+            <div class="nav-section-title mt-3">Administración</div>
+            <a th:href="@{/celdas}" class="sidebar-link">
+                <i class="bi bi-grid-3x3-gap"></i>
+                <span>Estado de celdas</span>
+            </a>
+            <a th:href="@{/novedades/vehiculo}" class="sidebar-link">
+                <i class="bi bi-file-earmark-text"></i>
+                <span>Novedades de vehículo</span>
+            </a>
+            <a th:href="@{/historial}" class="sidebar-link">
+                <i class="bi bi-clock-history"></i>
+                <span>Historial</span>
+            </a>
+
+            <div class="nav-section-title mt-3">Cliente</div>
+            <a th:href="@{/consultar-celda}" class="sidebar-link">
+                <i class="bi bi-geo-alt"></i>
+                <span>Consultar mi celda</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="fw-bold text-dark">Puesto de operación</div>
+            <div>Consola para empleados</div>
+            <div>Control de vehículos</div>
+        </div>
+    </aside>
+
+    <!-- Área Principal -->
+    <div class="main-wrapper">
+        <header class="topbar">
+            <div class="breadcrumb-nav">
+                <span>Operación</span>
+                <i class="bi bi-chevron-right mx-1 small"></i>
+                <span class="active">Registrar salida</span>
+            </div>
+            <div class="topbar-meta">
+                <div>
+                    <i class="bi bi-calendar3 me-1"></i>
+                    <span th:text="${fechaActual}">27 de octubre de 2026</span>
+                </div>
+                <div class="user-badge">
+                    <i class="bi bi-person-circle fs-5 text-secondary"></i>
+                    <span>Empleado</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="content-body">
+            <!-- Header contextual dinámico -->
+            <div class="page-category-badge" th:text="${bloqueada ? 'CICLO 2 / HU-09' : (noEncontrado ? 'CICLO 2 / HU-10' : 'CICLO 2 / HU-06')}">CICLO 2 / HU-06</div>
+
+            <h1 class="page-title" th:text="${bloqueada ? 'Salida bloqueada' : (noEncontrado ? 'No se encontró un ingreso activo' : 'Registrar salida')}">Registrar salida</h1>
+
+            <p class="page-subtitle" th:if="${bloqueada}">El ingreso está activo, pero no cumple las condiciones necesarias para registrar la salida.</p>
+            <p class="page-subtitle" th:if="${noEncontrado}">No es posible registrar una salida para una placa sin una estadía activa.</p>
+            <p class="page-subtitle" th:if="${!bloqueada && !noEncontrado}">Busca la placa y verifica la estadía activa antes de registrar la salida del vehículo.</p>
+
+            <div class="row">
+                <!-- Columna Izquierda Principal -->
+                <div class="col-lg-8">
+                    <!-- Formulario de Búsqueda de Placa -->
+                    <div class="custom-card mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="card-section-title fs-6">Buscar ingreso activo</h2>
+                            <span class="text-muted small">Consulta por placa</span>
+                        </div>
+
+                        <form th:action="@{/salida}" method="get" class="row g-2 align-items-center">
+                            <div class="col-sm-9">
+                                <label for="buscarPlaca" class="visually-hidden">Placa del vehículo</label>
+                                <input type="text"
+                                       id="buscarPlaca"
+                                       name="placa"
+                                       th:value="${placaBuscada}"
+                                       class="form-control form-control-lg fw-bold text-uppercase"
+                                       placeholder="Ej. ABC123"
+                                       style="letter-spacing: 0.08em; font-size: 1.35rem;"
+                                       required>
+                            </div>
+                            <div class="col-sm-3">
+                                <button type="submit" class="btn btn-primary-action w-100 justify-content-center py-3">
+                                    <i class="bi bi-search"></i>
+                                    <span>Buscar ingreso</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- CASO 1: HU-06 - INGRESO ACTIVO LISTO PARA SALIDA -->
+                    <div th:if="${listaParaSalida}" class="custom-card">
+                        <div class="d-flex justify-content-between align-items-center pb-3 border-bottom mb-4">
+                            <h3 class="card-section-title fs-6 mb-0">Ingreso activo encontrado</h3>
+                            <span class="text-muted small">Estadía activa</span>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded-3 border">
+                                    <div class="text-muted small mb-1">Placa del vehículo</div>
+                                    <div class="fs-2 fw-bold text-dark" th:text="${estadia.vehiculo.placa}">ABC123</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded-3 border h-100 d-flex flex-column justify-content-center">
+                                    <div class="text-muted small mb-1">Tipo de vehículo</div>
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <span class="fs-5 fw-bold text-dark" th:text="${estadia.vehiculo.tipo.nombre}">Automóvil</span>
+                                        <span class="badge bg-primary-subtle text-primary border border-primary">Ingreso activo</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Datos del Conductor y Celda -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="text-muted small">Nombre completo</div>
+                                <div class="fw-semibold text-dark fs-6" th:text="${estadia.conductor.nombre}">Valentina Rojas Méndez</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-muted small">Documento</div>
+                                <div class="fw-semibold text-dark fs-6" th:text="${estadia.conductor.documento}">1024567890</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-muted small">Entrada</div>
+                                <div class="fw-semibold text-dark fs-6" th:text="${#temporals.format(estadia.fechaHoraIngreso, 'd ''de'' MMMM ''de'' yyyy · hh:mm a')}">27 de octubre · 08:42 a. m.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-muted small">Celda asignada</div>
+                                <div class="fw-bold text-success fs-6" th:text="${estadia.celda.numero + ' · ' + estadia.vehiculo.tipo.zona}">A-012 · Zona A</div>
+                            </div>
+                        </div>
+
+                        <!-- Validaciones visuales (Sin novedades y sin pagos) -->
+                        <div class="d-flex gap-2 mb-4">
+                            <span class="badge bg-success-subtle text-success border border-success p-2 px-3">
+                                <i class="bi bi-check-circle-fill me-1"></i> Sin novedades pendientes
+                            </span>
+                            <span class="badge bg-success-subtle text-success border border-success p-2 px-3">
+                                <i class="bi bi-check-circle-fill me-1"></i> Sin pagos pendientes
+                            </span>
+                        </div>
+
+                        <!-- Formulario para Confirmar Salida -->
+                        <form th:action="@{/salida/confirmar}" method="post" class="d-flex justify-content-between align-items-center pt-3 border-top">
+                            <input type="hidden" name="codigoEstadia" th:value="${estadia.codigo}">
+                            <div>
+                                <div class="fw-bold text-dark small">Lista para registrar salida</div>
+                                <div class="text-muted small">La fecha y hora de salida se asignan automáticamente al confirmar.</div>
+                            </div>
+                            <button type="submit" class="btn-primary-action">
+                                <span>Registrar salida</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- CASO 2: HU-09 - SALIDA BLOQUEADA POR NOVEDADES O PAGOS -->
+                    <div th:if="${bloqueada}" class="custom-card">
+                        <div class="d-flex justify-content-between align-items-center pb-3 border-bottom mb-4">
+                            <h3 class="card-section-title fs-6 mb-0 text-danger">Ingreso activo · <span th:text="${estadia.vehiculo.placa}">KLM456</span></h3>
+                            <span class="badge bg-danger-subtle text-danger border border-danger">Salida no permitida</span>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded-3 border">
+                                    <div class="text-muted small mb-1">Placa del vehículo</div>
+                                    <div class="fs-2 fw-bold text-dark" th:text="${estadia.vehiculo.placa}">KLM456</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded-3 border h-100 d-flex flex-column justify-content-center">
+                                    <div class="text-muted small mb-1">Tipo de vehículo</div>
+                                    <span class="fs-5 fw-bold text-dark" th:text="${estadia.vehiculo.tipo.nombre}">Automóvil</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="text-muted small">Nombre completo</div>
+                                <div class="fw-semibold text-dark fs-6" th:text="${estadia.conductor.nombre}">Andrés Felipe Torres</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-muted small">Documento</div>
+                                <div class="fw-semibold text-dark fs-6" th:text="${estadia.conductor.documento}">1032456789</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-muted small">Entrada</div>
+                                <div class="fw-semibold text-dark fs-6" th:text="${#temporals.format(estadia.fechaHoraIngreso, 'd ''de'' MMMM · hh:mm a')}">27 de octubre · 09:05 a. m.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-muted small">Celda asignada</div>
+                                <div class="fw-bold text-dark fs-6" th:text="${estadia.celda.numero}">A-006</div>
+                            </div>
+                        </div>
+
+                        <!-- Caja de Alertas de Motivos de Bloqueo -->
+                        <div class="figma-alert-danger">
+                            <div class="fw-bold mb-2">
+                                <i class="bi bi-shield-x me-1"></i>
+                                <span th:text="${validacion.motivosBloqueo.size() + ' motivo(s) que impiden la salida'}">Motivos que impiden la salida</span>
+                            </div>
+                            <ul class="mb-0 ps-3">
+                                <li th:each="motivo : ${validacion.motivosBloqueo}" th:text="${motivo}" class="mb-1">Novedad o pago pendiente</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                            <div class="text-muted small">
+                                <span th:text="${estadia.celda.numero}">A-006</span> permanece ocupada.
+                            </div>
+                            <button type="button" class="btn btn-secondary disabled" style="cursor: not-allowed;">
+                                <i class="bi bi-lock-fill me-1"></i>
+                                <span>Registrar salida</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- CASO 3: HU-10 - NO SE ENCONTRÓ UN INGRESO ACTIVO -->
+                    <div th:if="${noEncontrado}" class="custom-card text-center py-5">
+                        <div class="mb-3">
+                            <div class="d-inline-flex p-3 rounded-circle bg-light border text-muted">
+                                <i class="bi bi-search fs-1"></i>
+                            </div>
+                        </div>
+                        <h3 class="fs-4 fw-bold text-dark mb-2">
+                            <span th:text="${placaBuscada}">XYZ987</span> no tiene un ingreso activo
+                        </h3>
+                        <p class="text-muted mb-4 max-w-md mx-auto">
+                            Verifica la placa en el vehículo y corrige la búsqueda. No se ha registrado ninguna salida.
+                        </p>
+                        <div>
+                            <a th:href="@{/salida}" class="btn btn-outline-secondary px-4 py-2">
+                                <i class="bi bi-pencil me-1"></i> Corregir búsqueda
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Tarjetas Informativas según Mockup -->
+                <div class="col-lg-4">
+                    <!-- Tarjeta Antes de confirmar -->
+                    <div class="info-sidebar-card" th:if="${!noEncontrado}">
+                        <div class="info-sidebar-title">
+                            <i class="bi bi-info-circle text-primary fs-5"></i>
+                            <span>Antes de confirmar</span>
+                        </div>
+                        <div class="sidebar-step-item">
+                            <div class="sidebar-step-title">Verifica la placa y el conductor</div>
+                            <div class="sidebar-step-desc">La salida solo se permite con un ingreso activo, sin novedades ni pagos pendientes.</div>
+                        </div>
+                        <div class="sidebar-highlight-box mt-3">
+                            <i class="bi bi-lightning-charge fs-5"></i>
+                            <span>Al registrar una salida válida se guarda la hora de salida y se libera la celda automáticamente.</span>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta para el caso Sin cambios realizados (HU-10) -->
+                    <div class="info-sidebar-card" th:if="${noEncontrado}">
+                        <div class="info-sidebar-title">
+                            <i class="bi bi-shield-check text-success fs-5"></i>
+                            <span>Sin cambios realizados</span>
+                        </div>
+                        <div class="sidebar-step-item">
+                            <div class="sidebar-step-title">El ingreso activo es obligatorio</div>
+                            <div class="sidebar-step-desc">No se crea un movimiento de salida cuando la búsqueda no encuentra una estadía activa.</div>
+                        </div>
+                        <div class="sidebar-step-item">
+                            <div class="sidebar-step-desc">El historial y los estados de las celdas permanecen sin cambios.</div>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta de Referencia a HU -->
+                    <div class="p-3 bg-light rounded text-muted small">
+                        <div class="fw-bold mb-1">HU-06 / HU-09 / HU-10 · CICLO 2</div>
+                        «Como empleado del parqueadero, quiero registrar la salida de un vehículo mediante su placa, validar que tenga un ingreso activo sin novedades ni pagos pendientes y liberar la celda ocupada.»
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar ingreso - Parqueadero Autos Colombia</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="d-flex align-items-center">
+                <div class="brand-badge">P</div>
+                <div>
+                    <h1 class="brand-title">Parqueo</h1>
+                    <p class="brand-sub">Control de Ingreso</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">Operación</div>
+            <a th:href="@{/ingreso}" class="sidebar-link active">
+                <i class="bi bi-arrow-down-circle"></i>
+                <span>Registrar ingreso</span>
+            </a>
+            <a th:href="@{/salida}" class="sidebar-link">
+                <i class="bi bi-arrow-up-circle"></i>
+                <span>Registrar salida</span>
+            </a>
+            <a th:href="@{/novedades/celda}" class="sidebar-link">
+                <i class="bi bi-wrench"></i>
+                <span>Novedad de celda</span>
+            </a>
+
+            <div class="nav-section-title mt-3">Administración</div>
+            <a th:href="@{/celdas}" class="sidebar-link">
+                <i class="bi bi-grid-3x3-gap"></i>
+                <span>Estado de celdas</span>
+            </a>
+            <a th:href="@{/novedades/vehiculo}" class="sidebar-link">
+                <i class="bi bi-file-earmark-text"></i>
+                <span>Novedades de vehículo</span>
+            </a>
+            <a th:href="@{/historial}" class="sidebar-link">
+                <i class="bi bi-clock-history"></i>
+                <span>Historial</span>
+            </a>
+
+            <div class="nav-section-title mt-3">Cliente</div>
+            <a th:href="@{/consultar-celda}" class="sidebar-link">
+                <i class="bi bi-geo-alt"></i>
+                <span>Consultar mi celda</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="fw-bold text-dark">Puesto de ingreso</div>
+            <div>Consola para empleados</div>
+            <div>Control de vehículos</div>
+        </div>
+    </aside>
+
+    <!-- Área Principal -->
+    <div class="main-wrapper">
+        <header class="topbar">
+            <div class="breadcrumb-nav">
+                <span>Operación</span>
+                <i class="bi bi-chevron-right mx-1 small"></i>
+                <span class="active">Registro de ingreso</span>
+            </div>
+            <div class="topbar-meta">
+                <div>
+                    <i class="bi bi-calendar3 me-1"></i>
+                    <span th:text="${fechaActual}">27 de octubre de 2026</span>
+                </div>
+                <div class="user-badge">
+                    <i class="bi bi-person-circle fs-5 text-secondary"></i>
+                    <span>Empleado</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="content-body">
+            <div class="page-category-badge">HU-01 / Nuevo ingreso</div>
+            <h1 class="page-title">Registrar ingreso</h1>
+            <p class="page-subtitle">Ingresa los datos del vehículo y del conductor para registrar su llegada.</p>
+
+            <div class="row">
+                <!-- Columna Izquierda: Formulario Principal -->
+                <div class="col-lg-8">
+                    <div class="custom-card">
+                        <div class="card-section-header">
+                            <h2 class="card-section-title">Información del ingreso</h2>
+                            <span class="required-hint" th:text="${errorTipo != null ? 'Datos conservados' : '* Campos obligatorios'}">* Campos obligatorios</span>
+                        </div>
+
+                        <!-- Alertas Dinámicas según caso (HU-02, HU-05, etc.) -->
+                        <!-- Caso HU-02: Placa no válida -->
+                        <div th:if="${errorTipo == 'PLACA_INVALIDA'}" class="figma-alert-danger">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <i class="bi bi-exclamation-circle-fill fs-5"></i>
+                                <strong class="fs-6">La placa no coincide con el formato de ejemplo</strong>
+                            </div>
+                            <div th:text="${errorMensaje}">No se registró el ingreso. Corrige la placa para el tipo de vehículo seleccionado.</div>
+                        </div>
+
+                        <!-- Caso HU-05: Sin cupo disponible -->
+                        <div th:if="${errorTipo == 'SIN_CUPOS'}" class="figma-alert-warning">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                                <strong class="fs-6">Ingreso no registrado · Sin cupo</strong>
+                            </div>
+                            <div th:text="${errorMensaje}">No se guardó una fecha de entrada ni se asignó una celda. No es posible confirmar sin una ubicación válida.</div>
+                        </div>
+
+                        <!-- Caso RF-19: Vehículo ya tiene estadía activa -->
+                        <div th:if="${errorTipo == 'INGRESO_ACTIVO'}" class="figma-alert-warning">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <i class="bi bi-shield-exclamation fs-5"></i>
+                                <strong class="fs-6">Estadía activa existente</strong>
+                            </div>
+                            <div th:text="${errorMensaje}">El vehículo ya se encuentra dentro del parqueadero.</div>
+                        </div>
+
+                        <!-- Otros errores o campos faltantes -->
+                        <div th:if="${errorTipo != null && errorTipo != 'PLACA_INVALIDA' && errorTipo != 'SIN_CUPOS' && errorTipo != 'INGRESO_ACTIVO'}" class="figma-alert-danger">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <i class="bi bi-exclamation-circle-fill fs-5"></i>
+                                <strong class="fs-6">Revisa los campos obligatorios</strong>
+                            </div>
+                            <div th:text="${errorMensaje}">No se registró el ingreso. Completa todos los datos requeridos.</div>
+                        </div>
+
+                        <!-- Formulario -->
+                        <form th:action="@{/ingreso}" th:object="${dto}" method="post" id="formIngreso">
+                            <!-- Sección Vehículo -->
+                            <div class="mb-4">
+                                <div class="d-flex align-items-center gap-2 mb-2 text-dark fw-bold">
+                                    <i class="bi bi-car-front fs-5 text-secondary"></i>
+                                    <span>Vehículo</span>
+                                </div>
+
+                                <div class="plate-input-container">
+                                    <label class="form-label small fw-bold text-dark" for="inputPlaca">Placa *</label>
+                                    <input type="text"
+                                           id="inputPlaca"
+                                           th:field="*{placa}"
+                                           class="plate-input"
+                                           th:classappend="${errorTipo == 'PLACA_INVALIDA' ? 'is-invalid' : ''}"
+                                           placeholder="Ej. ABC123"
+                                           maxlength="10"
+                                           autocomplete="off"
+                                           required>
+                                    <div class="form-text mt-1 text-muted">Escribe la placa tal como aparece en el vehículo.</div>
+                                    <div th:if="${errorTipo == 'PLACA_INVALIDA'}" class="text-danger small mt-1" th:text="${errorMensaje}">Formato no válido.</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-dark">Tipo de vehículo *</label>
+                                    <input type="hidden" id="tipoVehiculoInput" th:field="*{tipo}" required>
+
+                                    <div class="vehicle-type-group">
+                                        <!-- Tarjeta Automóvil -->
+                                        <div class="vehicle-type-card"
+                                             id="cardAuto"
+                                             th:classappend="*{tipo?.name() == 'AUTOMOVIL' ? 'selected' : ''}"
+                                             onclick="seleccionarTipo('AUTOMOVIL')">
+                                            <div class="vehicle-type-card-info">
+                                                <i class="bi bi-car-front fs-4"></i>
+                                                <span>Automóvil</span>
+                                            </div>
+                                            <div class="radio-dot"></div>
+                                        </div>
+
+                                        <!-- Tarjeta Motocicleta -->
+                                        <div class="vehicle-type-card"
+                                             id="cardMoto"
+                                             th:classappend="*{tipo?.name() == 'MOTOCICLETA' ? 'selected' : ''}"
+                                             onclick="seleccionarTipo('MOTOCICLETA')">
+                                            <div class="vehicle-type-card-info">
+                                                <i class="bi bi-bicycle fs-4"></i>
+                                                <span>Motocicleta</span>
+                                            </div>
+                                            <div class="radio-dot"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-text text-muted">Selecciona una opción.</div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4" style="border-color: var(--border-color);">
+
+                            <!-- Sección Conductor -->
+                            <div class="mb-4">
+                                <div class="d-flex align-items-center gap-2 mb-3 text-dark fw-bold">
+                                    <i class="bi bi-person fs-5 text-secondary"></i>
+                                    <span>Conductor</span>
+                                    <span class="badge bg-light text-muted fw-normal">Datos requeridos</span>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-dark" for="inputNombre">Nombre completo *</label>
+                                        <input type="text"
+                                               id="inputNombre"
+                                               th:field="*{nombreConductor}"
+                                               class="form-control form-control-lg fs-6"
+                                               placeholder="Ej. Valentina Rojas Méndez"
+                                               required>
+                                        <div class="form-text text-muted">Nombre y apellidos del conductor.</div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-dark" for="inputDocumento">Documento *</label>
+                                        <input type="text"
+                                               id="inputDocumento"
+                                               th:field="*{documentoConductor}"
+                                               class="form-control form-control-lg fs-6"
+                                               placeholder="Ej. 1024567890"
+                                               required>
+                                        <div class="form-text text-muted">Número de identificación del conductor.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botón de acción y nota -->
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                                <div class="text-muted small d-flex align-items-center gap-2">
+                                    <i class="bi bi-clock"></i>
+                                    <span>Fecha, hora y celda automáticas al registrar</span>
+                                </div>
+
+                                <button type="submit" class="btn-primary-action" id="btnRegistrar">
+                                    <span>Registrar ingreso</span>
+                                    <i class="bi bi-arrow-right"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Tarjetas Informativas según Figma -->
+                <div class="col-lg-4">
+                    <!-- Tarjeta Un ingreso, tres datos -->
+                    <div class="info-sidebar-card">
+                        <div class="info-sidebar-title">
+                            <i class="bi bi-journal-check text-success fs-5"></i>
+                            <span>Un ingreso, tres datos</span>
+                        </div>
+
+                        <div class="sidebar-step-item">
+                            <div class="sidebar-step-title">Placa del vehículo</div>
+                            <div class="sidebar-step-desc">Verifica que coincida con el vehículo que ingresa.</div>
+                        </div>
+
+                        <div class="sidebar-step-item">
+                            <div class="sidebar-step-title">Tipo de vehículo</div>
+                            <div class="sidebar-step-desc">Selecciona la opción correspondiente.</div>
+                        </div>
+
+                        <div class="sidebar-step-item mb-3">
+                            <div class="sidebar-step-title">Datos del conductor</div>
+                            <div class="sidebar-step-desc">Revisa la información antes de registrar.</div>
+                        </div>
+
+                        <div class="sidebar-highlight-box">
+                            <i class="bi bi-clock-history fs-5"></i>
+                            <span>La fecha y la hora se asignan automáticamente al registrar el ingreso.</span>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta Cupos Disponibles por Tipo -->
+                    <div class="info-sidebar-card">
+                        <div class="info-sidebar-title">
+                            <i class="bi bi-info-circle text-primary fs-5"></i>
+                            <span>Cupos por tipo</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                            <span class="text-dark fw-semibold">Automóvil</span>
+                            <span class="badge"
+                                  th:classappend="${disponiblesAutos > 0 ? 'bg-success-subtle text-success border border-success' : 'bg-danger-subtle text-danger border border-danger'}"
+                                  th:text="${disponiblesAutos + ' disponibles'}">12 disponibles</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center py-2">
+                            <span class="text-dark fw-semibold">Motocicleta</span>
+                            <span class="badge"
+                                  th:classappend="${disponiblesMotos > 0 ? 'bg-success-subtle text-success border border-success' : 'bg-danger-subtle text-danger border border-danger'}"
+                                  th:text="${disponiblesMotos + ' disponibles'}">8 disponibles</span>
+                        </div>
+
+                        <div th:if="${disponiblesAutos == 0}" class="text-warning-emphasis small mt-2">
+                            <i class="bi bi-exclamation-triangle me-1"></i> No hay celdas para automóviles en este momento.
+                        </div>
+                        <div th:if="${disponiblesMotos == 0}" class="text-warning-emphasis small mt-2">
+                            <i class="bi bi-exclamation-triangle me-1"></i> No hay celdas para motocicletas en este momento.
+                        </div>
+                    </div>
+
+                    <!-- Nota al pie de mockup -->
+                    <div class="p-3 bg-light rounded text-muted small">
+                        <div class="fw-bold mb-1">HU-01 / HU-02 / HU-05</div>
+                        «Como empleado del parqueadero, quiero registrar el ingreso de un vehículo y que el sistema valide el formato de la placa y asigne automáticamente una celda compatible disponible.»
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    function seleccionarTipo(tipo) {
+        document.getElementById('tipoVehiculoInput').value = tipo;
+        const cardAuto = document.getElementById('cardAuto');
+        const cardMoto = document.getElementById('cardMoto');
+
+        if (tipo === 'AUTOMOVIL') {
+            cardAuto.classList.add('selected');
+            cardMoto.classList.remove('selected');
+        } else if (tipo === 'MOTOCICLETA') {
+            cardMoto.classList.add('selected');
+            cardAuto.classList.remove('selected');
+        }
+    }
+
+    // Por defecto seleccionar Automóvil si no hay tipo seleccionado
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.getElementById('tipoVehiculoInput');
+        if (!input.value) {
+            seleccionarTipo('AUTOMOVIL');
+        } else {
+            seleccionarTipo(input.value);
+        }
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
