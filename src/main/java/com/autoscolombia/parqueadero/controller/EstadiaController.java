@@ -95,6 +95,9 @@ public class EstadiaController {
                                       Model model) {
         model.addAttribute("fechaActual", LocalDate.now().format(formateadorFecha));
         model.addAttribute("placaBuscada", placa != null ? placa.trim().toUpperCase() : "");
+        model.addAttribute("bloqueada", false);
+        model.addAttribute("noEncontrado", false);
+        model.addAttribute("listaParaSalida", false);
 
         if (placa != null && !placa.trim().isEmpty()) {
             String placaLimpia = placa.trim().toUpperCase();

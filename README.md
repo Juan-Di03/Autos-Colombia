@@ -68,7 +68,7 @@ java -jar target/parqueadero-0.0.1-SNAPSHOT.jar
 ```
 
 La aplicación iniciará en:
-👉 **http://localhost:8080**
+👉 **http://localhost:8081**
 
 ### 3. Consola de Base de Datos Embebida (H2 Console)
 - **URL:** `http://localhost:8080/h2-console`

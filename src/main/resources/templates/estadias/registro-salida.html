@@ -87,13 +87,13 @@
 
         <main class="content-body">
             <!-- Header contextual dinámico -->
-            <div class="page-category-badge" th:text="${bloqueada ? 'CICLO 2 / HU-09' : (noEncontrado ? 'CICLO 2 / HU-10' : 'CICLO 2 / HU-06')}">CICLO 2 / HU-06</div>
+            <div class="page-category-badge" th:text="${bloqueada == true ? 'CICLO 2 / HU-09' : (noEncontrado == true ? 'CICLO 2 / HU-10' : 'CICLO 2 / HU-06')}">CICLO 2 / HU-06</div>
 
-            <h1 class="page-title" th:text="${bloqueada ? 'Salida bloqueada' : (noEncontrado ? 'No se encontró un ingreso activo' : 'Registrar salida')}">Registrar salida</h1>
+            <h1 class="page-title" th:text="${bloqueada == true ? 'Salida bloqueada' : (noEncontrado == true ? 'No se encontró un ingreso activo' : 'Registrar salida')}">Registrar salida</h1>
 
-            <p class="page-subtitle" th:if="${bloqueada}">El ingreso está activo, pero no cumple las condiciones necesarias para registrar la salida.</p>
-            <p class="page-subtitle" th:if="${noEncontrado}">No es posible registrar una salida para una placa sin una estadía activa.</p>
-            <p class="page-subtitle" th:if="${!bloqueada && !noEncontrado}">Busca la placa y verifica la estadía activa antes de registrar la salida del vehículo.</p>
+            <p class="page-subtitle" th:if="${bloqueada == true}">El ingreso está activo, pero no cumple las condiciones necesarias para registrar la salida.</p>
+            <p class="page-subtitle" th:if="${noEncontrado == true}">No es posible registrar una salida para una placa sin una estadía activa.</p>
+            <p class="page-subtitle" th:if="${bloqueada != true && noEncontrado != true}">Busca la placa y verifica la estadía activa antes de registrar la salida del vehículo.</p>
 
             <div class="row">
                 <!-- Columna Izquierda Principal -->
