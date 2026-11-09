@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<div>
+    <!-- Encabezado de página -->
+    <div class="mb-4">
+        <div class="page-category-badge">ADMINISTRACIÓN</div>
+        <h1 class="page-title">Novedades de Vehículo</h1>
+        <p class="page-subtitle">Consulta y seguimiento de daños, rayones o novedades reportadas a vehículos</p>
+    </div>
+
+    <!-- Alertas Flash -->
+    <div th:if="${exito != null and !exito.isEmpty()}" class="figma-alert-success d-flex align-items-center gap-2">
+        <i class="bi bi-check-circle-fill fs-5"></i>
+        <span th:text="${exito}">Operación exitosa</span>
+    </div>
+    <div th:if="${errorGlobal != null and !errorGlobal.isEmpty()}" class="figma-alert-danger d-flex align-items-center gap-2">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        <span th:text="${errorGlobal}">Error en la operación</span>
+    </div>
+
+    <!-- Buscador por placa -->
+    <div class="custom-card mb-4">
+        <form th:action="@{/novedades/vehiculo}" method="get" class="row g-3 align-items-end">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small text-muted">Filtrar por Placa del Vehículo</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="placa" class="form-control border-start-0 text-uppercase fw-bold" 
+                           placeholder="Ej. ABC123" th:value="${placa}">
+                </div>
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-outline-secondary w-100 fw-semibold">
+                    <i class="bi bi-funnel me-1"></i> Buscar
+                </button>
+                <a th:href="@{/novedades/vehiculo}" class="btn btn-light border text-muted px-3" title="Limpiar">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Listado de Novedades de Vehículo -->
+    <div class="custom-card">
+        <div class="card-section-header">
+            <h2 class="card-section-title">Registro de Novedades en Vehículos (<span th:text="${novedades.size()}">0</span>)</h2>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="border-0">Placa</th>
+                        <th class="border-0">Fecha y Hora</th>
+                        <th class="border-0">Tipo de Novedad</th>
+                        <th class="border-0">Descripción</th>
+                        <th class="border-0">¿Bloquea Salida?</th>
+                        <th class="border-0">Estado</th>
+                        <th class="border-0 text-end">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${novedades.isEmpty()}">
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            <i class="bi bi-shield-check fs-3 text-success d-block mb-2"></i>
+                            No hay novedades registradas para los criterios especificados.
+                        </td>
+                    </tr>
+                    <tr th:each="n : ${novedades}">
+                        <td class="fw-bold fs-6">
+                            <span class="badge bg-dark-subtle text-dark border" 
+                                  th:text="${n.estadia != null and n.estadia.vehiculo != null ? n.estadia.vehiculo.placa : '—'}">ABC123</span>
+                        </td>
+                        <td class="small text-muted" th:text="${#temporals.format(n.fecha, 'dd/MM/yyyy HH:mm')}">27/10/2026</td>
+                        <td class="fw-semibold small" th:text="${n.tipoDano != null ? n.tipoDano : 'Novedad física'}">Golpe lateral</td>
+                        <td class="small text-muted" th:text="${n.descripcion}">Descripción...</td>
+                        <td>
+                            <span th:if="${n.bloqueaSalida}" class="badge bg-danger-subtle text-danger">
+                                <i class="bi bi-lock-fill me-1"></i> Sí, bloquea
+                            </span>
+                            <span th:unless="${n.bloqueaSalida}" class="badge bg-secondary-subtle text-muted">
+                                No
+                            </span>
+                        </td>
+                        <td>
+                            <span th:classappend="${n.estado.name() == 'PENDIENTE' ? 'badge-novedad-pendiente' : 'badge-novedad-resuelta'}"
+                                  th:text="${n.estado}">PENDIENTE</span>
+                        </td>
+                        <td class="text-end">
+                            <form th:if="${n.estado.name() == 'PENDIENTE'}" 
+                                  th:action="@{/novedades/vehiculo/{id}/resolver(id=${n.codigo})}" method="post">
+                                <button type="submit" class="btn btn-sm btn-outline-success">
+                                    <i class="bi bi-check2"></i> Resolver
+                                </button>
+                            </form>
+                            <span th:if="${n.estado.name() == 'RESUELTA'}" class="text-success small">
+                                <i class="bi bi-check-all"></i> Resuelta
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</html>

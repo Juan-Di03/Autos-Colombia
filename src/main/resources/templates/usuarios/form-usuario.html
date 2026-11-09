@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<div>
+    <!-- Encabezado de página -->
+    <div class="mb-4">
+        <a th:href="@{/usuarios}" class="text-decoration-none text-muted small fw-semibold">
+            <i class="bi bi-arrow-left me-1"></i> Volver al listado de usuarios
+        </a>
+        <div class="page-category-badge mt-2">ADMINISTRACIÓN</div>
+        <h1 class="page-title" th:text="${esEdicion ? 'Editar Usuario' : 'Registrar Nuevo Usuario'}">Usuario</h1>
+        <p class="page-subtitle" th:text="${esEdicion ? 'Modifica los datos del usuario seleccionado' : 'Ingresa los datos para dar de alta a un nuevo usuario'}">Formulario de usuario</p>
+    </div>
+
+    <!-- Error de validación -->
+    <div th:if="${error != null and !error.isEmpty()}" class="figma-alert-danger d-flex align-items-center gap-2">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        <span th:text="${error}">Error al guardar el usuario</span>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="custom-card">
+                <div class="card-section-header">
+                    <h2 class="card-section-title">Datos Personales y Perfil</h2>
+                    <span class="required-hint">* Campos obligatorios</span>
+                </div>
+
+                <form th:action="${esEdicion ? '/usuarios/' + usuario.codigo + '/actualizar' : '/usuarios/guardar'}" 
+                      method="post" th:object="${usuario}">
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Número de Documento *</label>
+                            <input type="text" th:field="*{documento}" class="form-control" 
+                                   placeholder="Ej. 1024567890" required>
+                            <div class="form-text small">Cédula de ciudadanía o extranjería</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Rol en el Sistema *</label>
+                            <select th:field="*{rol}" class="form-select" required>
+                                <option th:each="r : ${roles}" th:value="${r}" th:text="${r}">ROL</option>
+                            </select>
+                            <div class="form-text small">Define los permisos y accesos</div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Nombre Completo *</label>
+                            <input type="text" th:field="*{nombre}" class="form-control" 
+                                   placeholder="Ej. Valentina Rojas Méndez" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Teléfono / Celular</label>
+                            <input type="tel" th:field="*{telefono}" class="form-control" 
+                                   placeholder="Ej. 3001234567">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Correo Electrónico</label>
+                            <input type="email" th:field="*{correo}" class="form-control" 
+                                   placeholder="Ej. usuario@autoscolombia.co">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                        <a th:href="@{/usuarios}" class="btn btn-outline-secondary px-4 fw-semibold">
+                            Cancelar
+                        </a>
+                        <button type="submit" class="btn-primary-action">
+                            <i class="bi bi-check2-circle"></i>
+                            <span th:text="${esEdicion ? 'Actualizar Usuario' : 'Guardar Usuario'}">Guardar</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="info-sidebar-card">
+                <div class="info-sidebar-title">
+                    <i class="bi bi-shield-lock text-success"></i>
+                    <span>Roles de Usuario</span>
+                </div>
+                <div class="sidebar-step-item">
+                    <div class="sidebar-step-title">ADMINISTRADOR</div>
+                    <div class="sidebar-step-desc">Acceso total a métricas, tarifas, celdas y usuarios del parqueadero.</div>
+                </div>
+                <div class="sidebar-step-item">
+                    <div class="sidebar-step-title">EMPLEADO</div>
+                    <div class="sidebar-step-desc">Operador de portería: registra ingresos, salidas y reporta novedades.</div>
+                </div>
+                <div class="sidebar-step-item">
+                    <div class="sidebar-step-title">CLIENTE</div>
+                    <div class="sidebar-step-desc">Usuario conductor o propietario mensualista registrado en el sistema.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</html>

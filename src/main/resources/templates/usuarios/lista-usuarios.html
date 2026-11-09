@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<div>
+    <!-- Encabezado de página -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <div class="page-category-badge">ADMINISTRACIÓN</div>
+            <h1 class="page-title">Gestión de Usuarios</h1>
+            <p class="page-subtitle">Administra los empleados, administradores y clientes del sistema</p>
+        </div>
+        <a th:href="@{/usuarios/nuevo}" class="btn-primary-action">
+            <i class="bi bi-person-plus-fill"></i>
+            <span>Nuevo Usuario</span>
+        </a>
+    </div>
+
+    <!-- Alertas Flash -->
+    <div th:if="${exito != null and !exito.isEmpty()}" class="figma-alert-success d-flex align-items-center gap-2">
+        <i class="bi bi-check-circle-fill fs-5"></i>
+        <span th:text="${exito}">Operación exitosa</span>
+    </div>
+    <div th:if="${errorGlobal != null and !errorGlobal.isEmpty()}" class="figma-alert-danger d-flex align-items-center gap-2">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        <span th:text="${errorGlobal}">Error en la operación</span>
+    </div>
+
+    <!-- Filtros de búsqueda -->
+    <div class="custom-card mb-4">
+        <form th:action="@{/usuarios}" method="get" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label fw-semibold small text-muted">Buscar por Documento</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="documento" class="form-control border-start-0" 
+                           placeholder="Ej. 1024567890" th:value="${filtroDocumento}">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold small text-muted">Filtrar por Rol</label>
+                <select name="rol" class="form-select">
+                    <option value="">Todos los roles</option>
+                    <option th:each="r : ${roles}" th:value="${r}" th:text="${r}" 
+                            th:selected="${filtroRol == r}">ROL</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-outline-secondary w-100 fw-semibold">
+                    <i class="bi bi-funnel me-1"></i> Filtrar
+                </button>
+                <a th:href="@{/usuarios}" class="btn btn-light border text-muted px-3" title="Limpiar filtros">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabla de Usuarios -->
+    <div class="custom-card">
+        <div class="card-section-header">
+            <h2 class="card-section-title">Usuarios Registrados (<span th:text="${usuarios.size()}">0</span>)</h2>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="border-0">Documento</th>
+                        <th class="border-0">Nombre Completo</th>
+                        <th class="border-0">Rol</th>
+                        <th class="border-0">Teléfono</th>
+                        <th class="border-0">Correo Electrónico</th>
+                        <th class="border-0 text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${usuarios.isEmpty()}">
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                            No se encontraron usuarios registrados con los criterios seleccionados.
+                        </td>
+                    </tr>
+                    <tr th:each="u : ${usuarios}">
+                        <td class="fw-bold" th:text="${u.documento}">1024567890</td>
+                        <td th:text="${u.nombre}">Nombre Apellido</td>
+                        <td>
+                            <span class="badge-rol" 
+                                  th:classappend="${u.rol.name() == 'ADMINISTRADOR' ? 'admin' : (u.rol.name() == 'EMPLEADO' ? 'empleado' : 'cliente')}"
+                                  th:text="${u.rol}">ROL</span>
+                        </td>
+                        <td th:text="${u.telefono != null and !u.telefono.isEmpty() ? u.telefono : '—'}">3001234567</td>
+                        <td th:text="${u.correo != null and !u.correo.isEmpty() ? u.correo : '—'}">correo@autoscolombia.co</td>
+                        <td class="text-end">
+                            <div class="d-inline-flex gap-1">
+                                <a th:href="@{/usuarios/{id}/editar(id=${u.codigo})}" 
+                                   class="btn btn-sm btn-outline-primary" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form th:action="@{/usuarios/{id}/eliminar(id=${u.codigo})}" method="post" 
+                                      onsubmit="return confirm('¿Confirma que desea eliminar al usuario ' + [[${u.nombre}]] + '?');" 
+                                      class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</html>

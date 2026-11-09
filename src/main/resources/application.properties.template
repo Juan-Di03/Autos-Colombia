@@ -1,0 +1,32 @@
+# ===============================================================
+# Configuración de Parqueadero Autos Colombia
+# PLANTILLA - Copia este archivo como application.properties
+# y completa con tus credenciales locales
+# ===============================================================
+server.port=8081
+spring.application.name=parqueadero
+
+# ===============================================================
+# Base de datos PostgreSQL (completar con credenciales locales)
+# ===============================================================
+spring.datasource.url=jdbc:postgresql://localhost:5432/AutosColombia
+spring.datasource.driverClassName=org.postgresql.Driver
+spring.datasource.username=TU_USUARIO_POSTGRES
+spring.datasource.password=TU_CONTRASENA_POSTGRES
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.format_sql=true
+
+# Configuración Thymeleaf
+spring.thymeleaf.cache=false
+spring.thymeleaf.mode=HTML
+spring.thymeleaf.encoding=UTF-8
+
+# ===============================================================
+# Configuración JWT (Tokens)
+# ===============================================================
+autoscolombia.security.jwt.secret=YXV0b3Njb2xvbWJpYVNlY3JldEtleTEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=
+autoscolombia.security.jwt.expiration=86400000
+autoscolombia.security.jwt.issuer=AutosColombia-API
+

@@ -16,6 +16,8 @@
 
 	<properties>
 		<java.version>17</java.version>
+		<start-class>com.autoscolombia.parqueadero.ParqueaderoApplication</start-class>
+		<exec.mainClass>com.autoscolombia.parqueadero.ParqueaderoApplication</exec.mainClass>
 	</properties>
 
 	<dependencies>
@@ -43,6 +45,35 @@
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 
+		<!-- Spring Security & Thymeleaf Security Extras -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
+		</dependency>
+
+		<!-- JJWT (JSON Web Token) - Mismo estándar que RollerApp -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>0.11.5</version>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>0.11.5</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>0.11.5</version>
+			<scope>runtime</scope>
+		</dependency>
+
 		<!-- Driver Oficial PostgreSQL -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
@@ -57,10 +88,15 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Spring Boot Starter Test -->
+		<!-- Spring Boot Starter Test & Security Test -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -70,6 +106,9 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>com.autoscolombia.parqueadero.ParqueaderoApplication</mainClass>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

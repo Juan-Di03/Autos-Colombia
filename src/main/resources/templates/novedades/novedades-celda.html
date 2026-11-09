@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<div>
+    <!-- Encabezado de página -->
+    <div class="mb-4">
+        <div class="page-category-badge">OPERACIÓN</div>
+        <h1 class="page-title">Novedades de Celda</h1>
+        <p class="page-subtitle">Reporta y gestiona daños físicos, mantenimiento y eventos en las celdas</p>
+    </div>
+
+    <!-- Alertas Flash -->
+    <div th:if="${exito != null and !exito.isEmpty()}" class="figma-alert-success d-flex align-items-center gap-2">
+        <i class="bi bi-check-circle-fill fs-5"></i>
+        <span th:text="${exito}">Operación exitosa</span>
+    </div>
+    <div th:if="${errorGlobal != null and !errorGlobal.isEmpty()}" class="figma-alert-danger d-flex align-items-center gap-2">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        <span th:text="${errorGlobal}">Error en la operación</span>
+    </div>
+
+    <div class="row">
+        <!-- Formulario de Registro -->
+        <div class="col-lg-5">
+            <div class="custom-card">
+                <div class="card-section-header">
+                    <h2 class="card-section-title">Reportar Nueva Novedad</h2>
+                    <span class="required-hint">* Obligatorio</span>
+                </div>
+
+                <form th:action="@{/novedades/celda/registrar}" method="post">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Celda Afectada *</label>
+                        <select name="celdaId" class="form-select" required>
+                            <option value="">Seleccione una celda...</option>
+                            <option th:each="c : ${celdas}" th:value="${c.codigo}" 
+                                    th:text="${c.numero + ' (' + c.tipo + ' - ' + c.estado + ')'}">A-001</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tipo de Daño / Causa</label>
+                        <input type="text" name="tipoDano" class="form-control" 
+                               placeholder="Ej. Deterioro de pintura, mancha de aceite, fisura en piso">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Descripción Detallada *</label>
+                        <textarea name="descripcion" class="form-control" rows="3" 
+                                  placeholder="Explique la situación y acciones requeridas..." required></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Empleado que Reporta *</label>
+                        <select name="empleadoId" class="form-select" required>
+                            <option value="">Seleccione al empleado...</option>
+                            <option th:each="emp : ${empleados}" th:value="${emp.codigo}" 
+                                    th:text="${emp.nombre}">Valentina Rojas</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-primary-action w-100 justify-content-center">
+                        <i class="bi bi-send-fill"></i>
+                        <span>Registrar Novedad</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Listado de Novedades -->
+        <div class="col-lg-7">
+            <div class="custom-card">
+                <div class="card-section-header">
+                    <h2 class="card-section-title">Historial de Novedades en Celdas</h2>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="border-0">Celda</th>
+                                <th class="border-0">Fecha</th>
+                                <th class="border-0">Descripción</th>
+                                <th class="border-0">Estado</th>
+                                <th class="border-0 text-end">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${novedades.isEmpty()}">
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    <i class="bi bi-check-circle fs-3 text-success d-block mb-2"></i>
+                                    No hay novedades reportadas en las celdas.
+                                </td>
+                            </tr>
+                            <tr th:each="n : ${novedades}">
+                                <td class="fw-bold" th:text="${n.celda != null ? n.celda.numero : '—'}">A-001</td>
+                                <td class="small text-muted" th:text="${#temporals.format(n.fecha, 'dd/MM/yyyy HH:mm')}">27/10/2026</td>
+                                <td>
+                                    <div class="fw-semibold small" th:text="${n.tipoDano != null ? n.tipoDano : 'Novedad física'}">Tipo</div>
+                                    <div class="text-muted small" th:text="${n.descripcion}">Descripción del evento...</div>
+                                </td>
+                                <td>
+                                    <span th:classappend="${n.estado.name() == 'PENDIENTE' ? 'badge-novedad-pendiente' : 'badge-novedad-resuelta'}"
+                                          th:text="${n.estado}">PENDIENTE</span>
+                                </td>
+                                <td class="text-end">
+                                    <form th:if="${n.estado.name() == 'PENDIENTE'}" 
+                                          th:action="@{/novedades/celda/{id}/resolver(id=${n.codigo})}" method="post">
+                                        <button type="submit" class="btn btn-sm btn-outline-success" title="Marcar como resuelta">
+                                            <i class="bi bi-check2"></i> Resolver
+                                        </button>
+                                    </form>
+                                    <span th:if="${n.estado.name() == 'RESUELTA'}" class="text-success small">
+                                        <i class="bi bi-check-all"></i>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</html>

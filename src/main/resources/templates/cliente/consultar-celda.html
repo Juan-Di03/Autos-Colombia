@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<div>
+    <!-- Encabezado de página -->
+    <div class="mb-4">
+        <div class="page-category-badge">CLIENTE</div>
+        <h1 class="page-title">Consultar Mi Celda</h1>
+        <p class="page-subtitle">Digita la placa de tu vehículo para verificar en qué celda te encuentras asignado</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <!-- Formulario de Consulta -->
+            <div class="custom-card text-center py-4 mb-4">
+                <i class="bi bi-geo-alt-fill text-success fs-1 mb-2"></i>
+                <h2 class="card-section-title mb-2">Localizador de Vehículo</h2>
+                <p class="text-muted small mb-4">Ingresa la placa para consultar la celda y hora de entrada</p>
+
+                <form th:action="@{/consultar-celda}" method="get" class="d-flex justify-content-center">
+                    <div class="input-group" style="max-width: 420px;">
+                        <input type="text" name="placa" class="plate-input text-center" 
+                               placeholder="Ej. ABC123" th:value="${placa}" required autofocus>
+                        <button type="submit" class="btn-primary-action px-4">
+                            <i class="bi bi-search"></i>
+                            <span>Buscar</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Resultado Positivo -->
+            <div th:if="${consultado and ticketActivo != null}" class="custom-card border-success">
+                <div class="d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom">
+                    <div>
+                        <span class="badge bg-success-subtle text-success mb-1">Vehículo en Parqueadero</span>
+                        <h3 class="h4 mb-0 fw-bold" th:text="${ticketActivo.vehiculo.placa}">ABC123</h3>
+                    </div>
+                    <div class="celda-pill-highlight">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span th:text="${'Celda: ' + ticketActivo.celda.numero}">Celda: A-001</span>
+                    </div>
+                </div>
+
+                <div class="row g-3 small">
+                    <div class="col-6">
+                        <div class="text-muted">Tipo de Vehículo</div>
+                        <div class="fw-semibold" th:text="${ticketActivo.vehiculo.tipo}">AUTOMOVIL</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-muted">Hora de Ingreso</div>
+                        <div class="fw-semibold" th:text="${#temporals.format(ticketActivo.fechaHoraIngreso, 'dd/MM/yyyy HH:mm')}">27/10/2026 10:15</div>
+                    </div>
+                    <div class="col-12" th:if="${ticketActivo.conductor != null}">
+                        <div class="text-muted">Conductor Registrado</div>
+                        <div class="fw-semibold" th:text="${ticketActivo.conductor.nombre}">Conductor</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resultado Negativo (No encontrado) -->
+            <div th:if="${consultado and ticketActivo == null}" class="figma-alert-warning d-flex align-items-center gap-3">
+                <i class="bi bi-info-circle-fill fs-4 text-warning"></i>
+                <div>
+                    <div class="fw-bold">No se encontró estadía activa para la placa <span th:text="${placa}">PLACA</span></div>
+                    <div class="small">El vehículo no se encuentra registrado dentro de las instalaciones o ya registró su salida.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</html>

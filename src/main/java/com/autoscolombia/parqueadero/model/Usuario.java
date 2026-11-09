@@ -10,7 +10,7 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long codigo;
 
-    @Column(name = "documento", length = 30)
+    @Column(name = "documento", length = 30, unique = true, nullable = false)
     private String documento;
 
     @Column(name = "nombre", nullable = false, length = 120)
@@ -18,6 +18,12 @@ public class Usuario {
 
     @Column(name = "telefono", length = 25)
     private String telefono;
+
+    @Column(name = "correo", length = 100)
+    private String correo;
+
+    @Column(name = "password", length = 255)
+    private String password;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "rol", nullable = false, length = 20)
@@ -63,6 +69,22 @@ public class Usuario {
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
+    }
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public RolUsuario getRol() {

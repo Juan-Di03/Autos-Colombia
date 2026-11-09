@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<div>
+    <!-- Encabezado de página -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <div class="page-category-badge">ADMINISTRACIÓN</div>
+            <h1 class="page-title">Tablero de Celdas</h1>
+            <p class="page-subtitle">Monitoreo y control de estado de las celdas de parqueo en tiempo real</p>
+        </div>
+        <a th:href="@{/novedades/celda}" class="btn btn-outline-secondary fw-semibold">
+            <i class="bi bi-wrench me-1"></i> Reportar Novedad de Celda
+        </a>
+    </div>
+
+    <!-- Alertas Flash -->
+    <div th:if="${exito != null and !exito.isEmpty()}" class="figma-alert-success d-flex align-items-center gap-2">
+        <i class="bi bi-check-circle-fill fs-5"></i>
+        <span th:text="${exito}">Operación exitosa</span>
+    </div>
+    <div th:if="${errorGlobal != null and !errorGlobal.isEmpty()}" class="figma-alert-danger d-flex align-items-center gap-2">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        <span th:text="${errorGlobal}">Error en la operación</span>
+    </div>
+
+    <!-- Indicadores de métricas -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon total"><i class="bi bi-grid-3x3-gap"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${totalCeldas}">20</div>
+                    <div class="stat-label">Total Celdas</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon disponible"><i class="bi bi-check2-circle"></i></div>
+                <div>
+                    <div class="stat-value text-success" th:text="${totalDisponibles}">15</div>
+                    <div class="stat-label">Disponibles (<span th:text="${disponiblesAuto}">0</span> Autos / <span th:text="${disponiblesMoto}">0</span> Motos)</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon ocupada"><i class="bi bi-car-front-fill"></i></div>
+                <div>
+                    <div class="stat-value text-primary" th:text="${totalOcupadas}">5</div>
+                    <div class="stat-label">Ocupadas</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon fuera-servicio"><i class="bi bi-slash-circle-fill"></i></div>
+                <div>
+                    <div class="stat-value text-danger" th:text="${totalFueraServicio}">0</div>
+                    <div class="stat-label">Fuera de Servicio</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección Celdas de Automóvil -->
+    <div class="custom-card mb-4">
+        <div class="card-section-header">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-car-front fs-5 text-primary"></i>
+                <h2 class="card-section-title">Celdas de Automóvil (Zona A)</h2>
+            </div>
+            <span class="badge bg-light text-muted border">Capacidad: 12</span>
+        </div>
+
+        <div class="celdas-grid">
+            <div th:each="c : ${celdasAuto}" class="celda-card"
+                 th:classappend="${c.estado.name() == 'DISPONIBLE' ? 'disponible' : (c.estado.name() == 'OCUPADA' ? 'ocupada' : 'fuera-servicio')}">
+                <div class="celda-card-numero" th:text="${c.numero}">A-001</div>
+                <span class="celda-card-badge" th:text="${c.estado}">DISPONIBLE</span>
+                
+                <!-- Acciones rápidas de cambio de estado -->
+                <div class="mt-2 pt-2 border-top">
+                    <form th:if="${c.estado.name() != 'OCUPADA'}" th:action="@{/celdas/{id}/estado(id=${c.codigo})}" method="post" class="d-inline">
+                        <input type="hidden" name="nuevoEstado" 
+                               th:value="${c.estado.name() == 'DISPONIBLE' ? 'FUERA_DE_SERVICIO' : 'DISPONIBLE'}">
+                        <button type="submit" class="btn btn-sm w-100 py-0"
+                                th:classappend="${c.estado.name() == 'DISPONIBLE' ? 'btn-outline-danger' : 'btn-outline-success'}"
+                                th:text="${c.estado.name() == 'DISPONIBLE' ? 'Deshabilitar' : 'Habilitar'}">
+                            Cambiar
+                        </button>
+                    </form>
+                    <span th:if="${c.estado.name() == 'OCUPADA'}" class="badge bg-secondary-subtle text-secondary small w-100 py-1">
+                        En uso
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección Celdas de Motocicleta -->
+    <div class="custom-card">
+        <div class="card-section-header">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-bicycle fs-5 text-success"></i>
+                <h2 class="card-section-title">Celdas de Motocicleta (Zona B)</h2>
+            </div>
+            <span class="badge bg-light text-muted border">Capacidad: 8</span>
+        </div>
+
+        <div class="celdas-grid">
+            <div th:each="c : ${celdasMoto}" class="celda-card"
+                 th:classappend="${c.estado.name() == 'DISPONIBLE' ? 'disponible' : (c.estado.name() == 'OCUPADA' ? 'ocupada' : 'fuera-servicio')}">
+                <div class="celda-card-numero" th:text="${c.numero}">B-001</div>
+                <span class="celda-card-badge" th:text="${c.estado}">DISPONIBLE</span>
+                
+                <!-- Acciones rápidas de cambio de estado -->
+                <div class="mt-2 pt-2 border-top">
+                    <form th:if="${c.estado.name() != 'OCUPADA'}" th:action="@{/celdas/{id}/estado(id=${c.codigo})}" method="post" class="d-inline">
+                        <input type="hidden" name="nuevoEstado" 
+                               th:value="${c.estado.name() == 'DISPONIBLE' ? 'FUERA_DE_SERVICIO' : 'DISPONIBLE'}">
+                        <button type="submit" class="btn btn-sm w-100 py-0"
+                                th:classappend="${c.estado.name() == 'DISPONIBLE' ? 'btn-outline-danger' : 'btn-outline-success'}"
+                                th:text="${c.estado.name() == 'DISPONIBLE' ? 'Deshabilitar' : 'Habilitar'}">
+                            Cambiar
+                        </button>
+                    </form>
+                    <span th:if="${c.estado.name() == 'OCUPADA'}" class="badge bg-secondary-subtle text-secondary small w-100 py-1">
+                        En uso
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</html>

@@ -24,4 +24,8 @@ public interface CeldaRepository extends JpaRepository<Celda, Long> {
     List<Celda> findByTipoOrderByNumeroAsc(TipoVehiculo tipo);
 
     List<Celda> findByEstadoOrderByNumeroAsc(EstadoCelda estado);
+    
+    boolean existsByNumeroIgnoreCase(String numero);
 }
+
+

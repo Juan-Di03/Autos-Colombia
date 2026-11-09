@@ -17,4 +17,8 @@ public class ReglaNegocioException extends RuntimeException {
     public String getTipoError() {
         return tipoError;
     }
+
+    public String getMensaje() {
+        return getMessage();
+    }
 }

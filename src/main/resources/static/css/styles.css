@@ -419,3 +419,153 @@ body {
     align-items: center;
     gap: 0.5rem;
 }
+
+/* ===============================================================
+   ESTILOS ITERACIÓN 2: CELDAS, USUARIOS, HISTORIAL, NOVEDADES
+   =============================================================== */
+
+/* Stat Cards (Tablero & Dashboard) */
+.stat-card {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.stat-icon.disponible { background-color: #ecfdf5; color: #059669; }
+.stat-icon.ocupada { background-color: #eff6ff; color: #2563eb; }
+.stat-icon.fuera-servicio { background-color: #fef2f2; color: #dc2626; }
+.stat-icon.total { background-color: #f8fafc; color: #475569; }
+
+.stat-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--text-dark);
+}
+
+.stat-label {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Grilla de Celdas */
+.celdas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 1rem;
+}
+
+.celda-card {
+    border-radius: 10px;
+    border: 2px solid;
+    padding: 1rem;
+    text-align: center;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    background: white;
+    position: relative;
+}
+
+.celda-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.celda-card.disponible {
+    border-color: #10b981;
+    background: #f0fdf4;
+}
+
+.celda-card.ocupada {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+
+.celda-card.fuera-servicio {
+    border-color: #ef4444;
+    background: #fef2f2;
+}
+
+.celda-card-numero {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.celda-card.disponible .celda-card-numero { color: #047857; }
+.celda-card.ocupada .celda-card-numero { color: #1d4ed8; }
+.celda-card.fuera-servicio .celda-card-numero { color: #b91c1c; }
+
+.celda-card-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+.celda-card.disponible .celda-card-badge {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.celda-card.ocupada .celda-card-badge {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.celda-card.fuera-servicio .celda-card-badge {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+/* Badges de Roles */
+.badge-rol {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding: 0.35rem 0.65rem;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+.badge-rol.admin { background-color: #fef3c7; color: #92400e; }
+.badge-rol.empleado { background-color: #e0e7ff; color: #3730a3; }
+.badge-rol.cliente { background-color: #e2e8f0; color: #334155; }
+
+/* Badges de Estado Novedad */
+.badge-novedad-pendiente {
+    background-color: #fee2e2;
+    color: #991b1b;
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+}
+
+.badge-novedad-resuelta {
+    background-color: #d1fae5;
+    color: #065f46;
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+}
+

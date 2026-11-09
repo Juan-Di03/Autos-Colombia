@@ -1,6 +1,8 @@
-# Parqueadero Autos Colombia - Sistema de Gestión Operativa
+# Autos Colombia - Sistema de Gestión de Parqueadero
 
-Sistema de información desarrollado para la gestión de operaciones diarias del parqueadero **"Autos Colombia"**, permitiendo el control de entradas y salidas de vehículos, validación de celdas compatibles, registro de novedades y consistencia transaccional.
+Repositorio del caso de estudio de Autos Colombia para la materia de Ingeniería de Software.
+
+Sistema de información desarrollado para la gestión de operaciones diarias del parqueadero **"Autos Colombia"**, permitiendo el control de entradas y salidas de vehículos, gestión de usuarios, tablero de celdas en tiempo real, registro de novedades y consistencia transaccional.
 
 ---
 
@@ -8,37 +10,39 @@ Sistema de información desarrollado para la gestión de operaciones diarias del
 
 - **Lenguaje:** Java 17 (LTS)
 - **Framework:** Spring Boot 3.3.4
-- **Arquitectura:** Modelo-Vista-Controlador (MVC Monolítico)
+- **Arquitectura:** Modelo-Vista-Controlador (MVC)
 - **Persistencia:** Spring Data JPA / Hibernate
 - **Base de Datos:**
-  - **Local inmediata:** H2 en modo PostgreSQL (sin requerir software adicional ni configuraciones externas).
-  - **Producción / Externa:** PostgreSQL (archivo DDL incluido).
-- **Frontend / Vistas:** Thymeleaf + Bootstrap 5 + Bootstrap Icons (fiel a los mockups de Figma).
-- **Pruebas:** JUnit 5, Spring Boot Test (8 pruebas unitarias e integradas).
+  - **Entorno Local / Producción:** PostgreSQL (`AutosColombia`) con scripts DDL y DML estructurados en la carpeta `database/`.
+  - **Entorno de Pruebas:** H2 en memoria (`mem:testdb`) para ejecución automatizada desacoplada.
+- **Frontend / Vistas:** Thymeleaf + Bootstrap 5 + Bootstrap Icons (inspirado en los mockups de Figma).
+- **Pruebas Automatizadas:** JUnit 5, Spring Boot Test, MockMvc (23 pruebas automatizadas unitarias e integradas - 100% aprobadas).
 
 ---
 
 ## 📁 Estructura del Proyecto
 
 ```text
-c:\Users\juan-\Desktop\Autos Colombia\
+Autos Colombia/
 ├── database/
-│   └── schema-postgresql.sql       # Script DDL completo con tablas, restricciones y datos semilla
+│   ├── 01_crear_base_de_datos.sql      # Script para crear la base de datos AutosColombia
+│   ├── 02_tablas_y_datos.sql           # Tablas, índices y datos semilla
+│   └── schema-postgresql.sql           # Guía de despliegue en PostgreSQL
 ├── src/
 │   ├── main/
 │   │   ├── java/com/autoscolombia/parqueadero/
-│   │   │   ├── config/             # Precarga de datos (20 celdas y usuarios)
-│   │   │   ├── controller/         # Controladores MVC (Ingreso y Salida)
-│   │   │   ├── dto/                # Data Transfer Objects y validaciones
-│   │   │   ├── exception/          # Manejo de reglas de negocio
-│   │   │   ├── model/              # Entidades JPA y Enums
-│   │   │   ├── repository/         # Interfaces Spring Data JPA
-│   │   │   └── service/            # Lógica transaccional
+│   │   │   ├── config/                 # Precarga inicial en entorno de pruebas
+│   │   │   ├── controller/             # Estadia, Usuario, Celda, Novedad, Historial, Consulta
+│   │   │   ├── dto/                    # RegistroIngresoDto, ValidacionSalidaDto
+│   │   │   ├── exception/              # ReglaNegocioException
+│   │   │   ├── model/                  # Usuario, Vehiculo, Celda, Estadia, Novedad y Enums
+│   │   │   ├── repository/             # Interfaces Spring Data JPA
+│   │   │   └── service/                # Lógica transaccional de negocio
 │   │   └── resources/
-│   │       ├── application.properties
-│   │       ├── static/css/styles.css # Estilos visuales de Figma
-│   │       └── templates/          # Vistas Thymeleaf (ingreso, salida, etc.)
-│   └── test/                       # Pruebas automatizadas (8 tests aprobados)
+│   │       ├── application.properties.template # Plantilla para configuración segura
+│   │       ├── static/css/styles.css   # Estilos visuales
+│   │       └── templates/              # Vistas Thymeleaf (estadias, usuarios, celdas, novedades, etc.)
+│   └── test/                           # 23 Pruebas automatizadas (Unitarias y de Integración)
 ├── .gitignore
 ├── pom.xml
 └── README.md
@@ -46,13 +50,20 @@ c:\Users\juan-\Desktop\Autos Colombia\
 
 ---
 
-## 🚀 Instrucciones para Ejecución Local
+## 🗄️ Despliegue de la Base de Datos PostgreSQL
 
-### 1. Requisitos Previos
-- **Java 17 JDK** o superior.
-- **Apache Maven 3.9+**.
+1. **Crear la Base de Datos:**
+   - Abre **pgAdmin** o la consola `psql` conectado a la base `postgres`.
+   - Ejecuta el script: `database/01_crear_base_de_datos.sql`
+2. **Crear Tablas y Datos Semilla:**
+   - Conéctate a la base de datos `AutosColombia`.
+   - Ejecuta el script: `database/02_tablas_y_datos.sql`
+3. **Configuración de la Aplicación:**
+   - Copia `src/main/resources/application.properties.template` como `src/main/resources/application.properties` y ajusta tus credenciales locales (`username` y `password`).
 
-### 2. Ejecutar la Aplicación
+---
+
+## 🚀 Ejecución de la Aplicación
 
 Desde la terminal en la raíz del proyecto:
 
@@ -60,57 +71,28 @@ Desde la terminal en la raíz del proyecto:
 mvn spring-boot:run
 ```
 
-O compilar y empaquetar el JAR:
-
-```bash
-mvn clean package
-java -jar target/parqueadero-0.0.1-SNAPSHOT.jar
-```
-
 La aplicación iniciará en:
 👉 **http://localhost:8081**
 
-### 3. Consola de Base de Datos Embebida (H2 Console)
-- **URL:** `http://localhost:8080/h2-console`
-- **JDBC URL:** `jdbc:h2:file:./data/autos_colombia_db;AUTO_SERVER=TRUE;DB_CLOSE_DELAY=-1;MODE=PostgreSQL`
-- **Usuario:** `sa`
-- **Contraseña:** *(vacía)*
-
----
-
-## 🗄️ Conexión con PostgreSQL
-
-Si deseas usar un servidor PostgreSQL (local o en la nube como Neon / Supabase):
-
-1. Ejecuta el script SQL ubicado en:
-   `database/schema-postgresql.sql`
-2. En `src/main/resources/application.properties`, descomenta las líneas de PostgreSQL:
-   ```properties
-   spring.datasource.url=jdbc:postgresql://localhost:5432/autos_colombia
-   spring.datasource.driverClassName=org.postgresql.Driver
-   spring.datasource.username=postgres
-   spring.datasource.password=tu_password
-   spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
-   ```
+### Rutas principales:
+- **Ingreso de Vehículos:** `http://localhost:8081/ingreso`
+- **Salida de Vehículos:** `http://localhost:8081/salida`
+- **Gestión de Usuarios:** `http://localhost:8081/usuarios`
+- **Tablero de Celdas:** `http://localhost:8081/celdas`
+- **Novedades de Celda:** `http://localhost:8081/novedades/celda`
+- **Novedades de Vehículo:** `http://localhost:8081/novedades/vehiculo`
+- **Historial de Estadías:** `http://localhost:8081/historial`
+- **Consulta de Celda (Cliente):** `http://localhost:8081/consultar-celda`
 
 ---
 
 ## 🧪 Pruebas Automatizadas
 
-Para ejecutar la suite de pruebas unitarias e integradas:
+Para ejecutar la suite completa de pruebas:
 
 ```bash
 mvn test
 ```
 
-### Casos de prueba cubiertos:
-- **Ciclo 1:**
-  - `HU-01, HU-03, HU-04`: Registro válido, asignación automática de celda compatible y registro de fecha/hora.
-  - `HU-02`: Rechazo de formato de placa inválido por tipo.
-  - `HU-05`: Rechazo de ingreso cuando no hay celdas disponibles para el tipo.
-  - `RF-19`: Impedir más de un ingreso activo para el mismo vehículo.
-- **Ciclo 2:**
-  - `HU-06, HU-07, HU-08`: Salida confirmada, finalización de estadía y liberación atómica de la celda.
-  - `HU-09`: Bloqueo de salida ante novedades pendientes de revisión.
-  - `HU-09`: Bloqueo de salida ante pago pendiente.
-  - `HU-10`: Manejo consistente de vehículo sin ingreso activo.
+**Resultado:**
+- 23 pruebas ejecutadas (0 fallos, 0 errores, BUILD SUCCESS).

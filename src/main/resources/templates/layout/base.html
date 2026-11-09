@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,34 +26,43 @@
         </div>
 
         <nav class="sidebar-nav">
-            <div class="nav-section-title">Operación</div>
-            <a th:href="@{/ingreso}" class="sidebar-link" th:classappend="${moduloActivo == 'ingreso' ? 'active' : ''}">
-                <i class="bi bi-arrow-down-circle"></i>
-                <span>Registrar ingreso</span>
-            </a>
-            <a th:href="@{/salida}" class="sidebar-link" th:classappend="${moduloActivo == 'salida' ? 'active' : ''}">
-                <i class="bi bi-arrow-up-circle"></i>
-                <span>Registrar salida</span>
-            </a>
-            <a th:href="@{/novedades/celda}" class="sidebar-link" th:classappend="${moduloActivo == 'novedad_celda' ? 'active' : ''}">
-                <i class="bi bi-wrench"></i>
-                <span>Novedad de celda</span>
-            </a>
+            <!-- Menú Operación: ADMINISTRADOR y EMPLEADO -->
+            <div sec:authorize="hasAnyRole('ADMINISTRADOR', 'EMPLEADO')">
+                <div class="nav-section-title">Operación</div>
+                <a th:href="@{/ingreso}" class="sidebar-link" th:classappend="${moduloActivo == 'ingreso' ? 'active' : ''}">
+                    <i class="bi bi-arrow-down-circle"></i>
+                    <span>Registrar ingreso</span>
+                </a>
+                <a th:href="@{/salida}" class="sidebar-link" th:classappend="${moduloActivo == 'salida' ? 'active' : ''}">
+                    <i class="bi bi-arrow-up-circle"></i>
+                    <span>Registrar salida</span>
+                </a>
+                <a th:href="@{/novedades/celda}" class="sidebar-link" th:classappend="${moduloActivo == 'novedad_celda' ? 'active' : ''}">
+                    <i class="bi bi-wrench"></i>
+                    <span>Novedad de celda</span>
+                </a>
 
-            <div class="nav-section-title mt-3">Administración</div>
-            <a th:href="@{/celdas}" class="sidebar-link" th:classappend="${moduloActivo == 'celdas' ? 'active' : ''}">
-                <i class="bi bi-grid-3x3-gap"></i>
-                <span>Estado de celdas</span>
-            </a>
-            <a th:href="@{/novedades/vehiculo}" class="sidebar-link" th:classappend="${moduloActivo == 'novedad_vehiculo' ? 'active' : ''}">
-                <i class="bi bi-file-earmark-text"></i>
-                <span>Novedades de vehículo</span>
-            </a>
-            <a th:href="@{/historial}" class="sidebar-link" th:classappend="${moduloActivo == 'historial' ? 'active' : ''}">
-                <i class="bi bi-clock-history"></i>
-                <span>Historial</span>
-            </a>
+                <div class="nav-section-title mt-3">Administración</div>
+                <a th:href="@{/usuarios}" class="sidebar-link" th:classappend="${moduloActivo == 'usuarios' ? 'active' : ''}"
+                   sec:authorize="hasRole('ADMINISTRADOR')">
+                    <i class="bi bi-people"></i>
+                    <span>Gestión de usuarios</span>
+                </a>
+                <a th:href="@{/celdas}" class="sidebar-link" th:classappend="${moduloActivo == 'celdas' ? 'active' : ''}">
+                    <i class="bi bi-grid-3x3-gap"></i>
+                    <span>Estado de celdas</span>
+                </a>
+                <a th:href="@{/novedades/vehiculo}" class="sidebar-link" th:classappend="${moduloActivo == 'novedad_vehiculo' ? 'active' : ''}">
+                    <i class="bi bi-file-earmark-text"></i>
+                    <span>Novedades de vehículo</span>
+                </a>
+                <a th:href="@{/historial}" class="sidebar-link" th:classappend="${moduloActivo == 'historial' ? 'active' : ''}">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Historial</span>
+                </a>
+            </div>
 
+            <!-- Menú Cliente: Disponible para todos -->
             <div class="nav-section-title mt-3">Cliente</div>
             <a th:href="@{/consultar-celda}" class="sidebar-link" th:classappend="${moduloActivo == 'consulta_cliente' ? 'active' : ''}">
                 <i class="bi bi-geo-alt"></i>
@@ -81,10 +90,15 @@
                     <i class="bi bi-calendar3 me-1"></i>
                     <span th:text="${fechaActual != null ? fechaActual : '27 oct 2026'}">27 oct 2026</span>
                 </div>
-                <div class="user-badge">
+                <div class="user-badge" sec:authorize="isAuthenticated()">
                     <i class="bi bi-person-circle fs-5 text-secondary"></i>
-                    <span th:text="${usuarioRol != null ? usuarioRol : 'Empleado'}">Empleado</span>
+                    <span sec:authentication="name">Usuario</span>
                 </div>
+                <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="Cerrar sesión">
+                        <i class="bi bi-box-arrow-right"></i> Salir
+                    </button>
+                </form>
             </div>
         </header>
 

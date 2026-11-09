@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<div>
+    <!-- Encabezado de página -->
+    <div class="mb-4">
+        <div class="page-category-badge">ADMINISTRACIÓN</div>
+        <h1 class="page-title">Historial de Estadías</h1>
+        <p class="page-subtitle">Registro completo de ingresos, salidas y tiempos de parqueo</p>
+    </div>
+
+    <!-- Buscador por placa -->
+    <div class="custom-card mb-4">
+        <form th:action="@{/historial}" method="get" class="row g-3 align-items-end">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small text-muted">Buscar por Placa</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="placa" class="form-control border-start-0 text-uppercase fw-bold" 
+                           placeholder="Ej. ABC123" th:value="${placa}">
+                </div>
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-outline-secondary w-100 fw-semibold">
+                    <i class="bi bi-funnel me-1"></i> Filtrar
+                </button>
+                <a th:href="@{/historial}" class="btn btn-light border text-muted px-3" title="Limpiar">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabla Historial -->
+    <div class="custom-card">
+        <div class="card-section-header">
+            <h2 class="card-section-title">Estadías Registradas (<span th:text="${estadias.size()}">0</span>)</h2>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="border-0"># Ticket</th>
+                        <th class="border-0">Placa</th>
+                        <th class="border-0">Tipo</th>
+                        <th class="border-0">Celda</th>
+                        <th class="border-0">Ingreso</th>
+                        <th class="border-0">Salida</th>
+                        <th class="border-0">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${estadias.isEmpty()}">
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            <i class="bi bi-clock-history fs-3 d-block mb-2"></i>
+                            No se encontraron registros de estadías con los filtros aplicados.
+                        </td>
+                    </tr>
+                    <tr th:each="e : ${estadias}">
+                        <td class="fw-bold" th:text="${'#' + e.codigo}">#1</td>
+                        <td>
+                            <span class="badge bg-light text-dark border fw-bold fs-6" 
+                                  th:text="${e.vehiculo != null ? e.vehiculo.placa : '—'}">ABC123</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary-subtle text-dark" 
+                                  th:text="${e.vehiculo != null ? e.vehiculo.tipo : '—'}">AUTOMOVIL</span>
+                        </td>
+                        <td class="fw-semibold text-primary" th:text="${e.celda != null ? e.celda.numero : '—'}">A-001</td>
+                        <td class="small" th:text="${#temporals.format(e.fechaHoraIngreso, 'dd/MM/yyyy HH:mm')}">27/10/2026 08:30</td>
+                        <td class="small" th:text="${e.fechaHoraSalida != null ? #temporals.format(e.fechaHoraSalida, 'dd/MM/yyyy HH:mm') : '—'}">—</td>
+                        <td>
+                            <span class="badge" 
+                                  th:classappend="${e.estado.name() == 'ACTIVO' ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'}"
+                                  th:text="${e.estado}">ACTIVO</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</html>

@@ -81,4 +81,25 @@ public class CeldaService {
         celda.setEstado(nuevoEstado);
         return celdaRepository.save(celda);
     }
+    
+    //Creacion de una nueba celda PRUEBA TC-CEL-01 HU-11 / RF-11 Registro de nueva celda con identificador único y tipo (Carro/Moto).
+    
+    @Transactional
+    public Celda crear(String numero, TipoVehiculo tipo) {
+    if (numero == null || numero.isBlank()) {
+        throw new ReglaNegocioException("NUMERO_REQUERIDO", "El identificador de la celda es obligatorio.");
+    }
+    if (tipo == null) {
+        throw new ReglaNegocioException("TIPO_REQUERIDO", "Debes seleccionar el tipo de celda.");
+    }
+    String id = numero.trim().toUpperCase();
+    if (!id.matches("[A-Z0-9-]{1,15}")) {
+        throw new ReglaNegocioException("NUMERO_INVALIDO",
+                "Usa solo letras, números y guiones (máximo 15 caracteres).");
+    }
+    if (celdaRepository.existsByNumeroIgnoreCase(id)) {
+        throw new ReglaNegocioException("CELDA_DUPLICADA", "Ya existe una celda con el identificador " + id);
+    }
+    return celdaRepository.save(new Celda(id, tipo, EstadoCelda.DISPONIBLE));
+}
 }
